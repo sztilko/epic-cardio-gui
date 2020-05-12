@@ -51,25 +51,31 @@ As the measurement could contain artefacts and baseline drift, first we need to 
 #### Interpolation
 The softwer offers the possibility to apply spatial interpolation on the data, for the reason of smoothing the signal of area-related measures such as IWS, average-WS and Area of single cells. Note that this could introduce deviences in calculated cell area compared to non-interpolated data depending on the level of evaluation threshold (see Evaluation)
 
-#### Detection and selection of cells
+### Detection and selection of cells
 Detection threshold should be given for the last frame of measurement such that all the cells are detected (indicated by red dots). After that, in filter cells tab the relevant cells can be selected.
 
-#### Evaluation
+### Evaluation
 The single cell signals can be acquired by two thresholding methods:
 - 'global thresholding' method determines the cell boundaries based on the user-defined global threshold value. In each timestep the cell area is determined as the above threshold regions. Drawback of this method is that we must introduce an ad-hoc parameter of the evaluation threshold, which seems to be cell specific and dependent on the adhesion strength.
 - 'unique thresholding' method determines the cell boundaries based on max-WS signal of each cell. The equation that calculates the cell-specific threshold is described in https://www.nature.com/articles/s41598-019-56898-7. Drawback of this method is that cells with small signals are assinged with too small areas (due to the near linear start of the mentioned calibartion equation).
 There is no preferred method, however global therhsholding gives seemingly better results on small signals(<500pm).
 
-#### Visualization of single-cell data
+### Visualization of single-cell data
 After evaluation is finished, 'Single cell data' tab shows the the following single cell modalities:
 - maximalWS: the maximal wavelength-shift pixel value in each timestep of the above threshold pixels
 - averageWS: the average wavelength-shift of the cell constituent pixels in each timestep
 - area: the area of the cell constituent pixels in each timestep
 - IWS: the surface integral of wavelength shift; calculated as averageWS * area
 
-Sigmoid fitting is possible in the 'Sigmoid fit' panel, where the each single cell signal (in each modality) is fitted with a 4 parameter sigmoid function: f = @(p,xdata) A /(1+exp(-r * (xdata-t0))) + A0 , where A is the amplitude, r is the rate, t0 is the time of inflexion point and A0 is the baseline.
+Sigmoid fitting is possible in the 'Sigmoid fit' panel, where each single cell signal (in each modality) is fitted with a 4 parameter sigmoid function: f = @(p,xdata) A /(1+exp(-r * (xdata-t0))) + A0 , where A is the amplitude, r is the rate, t0 is the time of inflexion point and A0 is the baseline.
 
-#### Exporting single-cell data
+### Exporting single-cell data
 By selecting the relevant modalities and fitted parameters the software exports the data to .xlsx files in the following format:
 - For modalities the first column and row containts the timesteps(in seconds) and cell labels respectively. The following entries contain the calculated modality data for each timestep/cell
 - For sigmoid fit parameters the exported file contains [cellID, amplitude, rate, offset, baseline] parameters in each columns
+
+## Possible development areas
+- RAW evaluation: currently the Imager Beta preprocessing steps are necessary beacuse we can not interpret the data in the raw DMR files in a meaningful way. This step involves repetitive manual work, that could be otherwise easily automated, thus speeding up the evaluation process.
+- .xls-.xlsx conversion and loading: additional easily automatable process is the conversion of files. It should be investigated which file format is the most effective for MATLAB read-in. The 'readtable()' function can take long to load the data (depending on the computer resources).
+- Bottlenecks of evaluation speed: Currently these methods are the slowest/most computationally costly: Local background correction, detection and evaluation. Check how these functions could be optimized
+- Wrapper for whole measurement evaluation: it would greatly imporve convenience to evaluate a whole folder of Imager Beta exported measurements, with predefined parameters for the relevant evaluation steps. With this approach however would come the risk of inappropriate evaluation, so suitable metrics and quality checks should be incorporated for the wrapper program output.
