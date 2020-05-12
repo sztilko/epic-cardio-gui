@@ -11,7 +11,12 @@ function [pic,time,img_size] = load_data(file)
 %   img_size - size of a side of the sensor image in pixels
 
 % data=xlsread(file);
-data=readmatrix(file);
+% data=readmatrix(file);
+
+%faster approach
+data_table=readtable(file,'basic',true);
+data = data_table{:,:};
+
 if size(data(:,1),1)~=size(unique(data(:,1)),1)
     time_avg_input(file);
     data=xlsread(strrep(file,'.xlsx','_timeavg.xlsx'));
